@@ -1,0 +1,57 @@
+#!/bin/bash
+#
+# s3-sync
+#
+# chkconfig: 3 98 1
+# description: Upload the log file to Amazon S3.
+#
+
+# source function library.
+. /etc/rc.d/init.d/functions
+
+prog="s3-sync"
+lockfile="/var/lock/subsys/${prog}"
+
+test -f /etc/sysconfig/${prog}.conf && . /etc/sysconfig/${prog}.conf
+
+if [ -z "${AWS_DEFAULT_REGION}" ] || [ -z "${AWS_S3_BUCKET_PATH}" ]; then
+    exit 6
+fi
+
+export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+
+start() {
+    touch ${lockfile}
+    retval=$?
+    return ${retval}
+}
+
+stop() {
+    for path in ${AWS_S3_BUCKET_PATH[@]}; do
+        local_path=`echo ${path} | cut -d % -f 1`
+        s3_path=`echo ${path} | cut -d % -f 2`
+        /usr/bin/aws s3 sync ${local_path} ${s3_path} --quiet
+    done
+
+    rm -f ${lockfile}
+    retval=$?
+    return ${retval}
+}
+
+case "${1}" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|sync)
+        stop
+        start
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|sync}"
+        exit 2
+esac
+
+exit $?
