@@ -18,8 +18,6 @@ if [ -z "${AWS_DEFAULT_REGION}" ] || [ -z "${AWS_S3_BUCKET_PATH}" ]; then
     exit 6
 fi
 
-export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-
 start() {
     touch ${lockfile}
     retval=$?
@@ -30,7 +28,7 @@ stop() {
     for path in ${AWS_S3_BUCKET_PATH[@]}; do
         local_path=`echo ${path} | cut -d % -f 1`
         s3_path=`echo ${path} | cut -d % -f 2`
-        /usr/bin/aws s3 sync ${local_path} ${s3_path} --quiet
+        aws s3 sync --region ${AWS_DEFAULT_REGION} --quiet ${local_path} ${s3_path}
     done
 
     rm -f ${lockfile}
