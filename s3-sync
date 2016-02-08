@@ -12,9 +12,9 @@
 prog="s3-sync"
 lockfile="/var/lock/subsys/${prog}"
 
-test -f /etc/sysconfig/${prog}.conf && . /etc/sysconfig/${prog}.conf
+test -f /etc/${prog}.conf && . /etc/${prog}.conf
 
-if [ -z "${AWS_DEFAULT_REGION}" ] || [ -z "${AWS_S3_BUCKET_PATH}" ]; then
+if [ -z "${AWS_DEFAULT_REGION}" ] || [ -z "${S3_SYNC_PATH}" ]; then
     exit 6
 fi
 
@@ -25,7 +25,7 @@ start() {
 }
 
 stop() {
-    for path in ${AWS_S3_BUCKET_PATH[@]}; do
+    for path in ${S3_SYNC_PATH[@]}; do
         local_path=`echo ${path} | cut -d % -f 1`
         s3_path=`echo ${path} | cut -d % -f 2`
         aws s3 sync --region ${AWS_DEFAULT_REGION} --quiet ${local_path} ${s3_path}
