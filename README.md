@@ -15,6 +15,7 @@ Upload the log file to Amazon S3.
 Setup.
 
 ```
+$ sudo mv s3-sync.conf /etc/sysconfig/s3-sync.conf
 $ sudo mv s3-sync /etc/init.d/s3-sync
 $ sudo chown root:root /etc/init.d/s3-sync
 $ sudo chmod +x /etc/init.d/s3-sync
@@ -35,8 +36,13 @@ $ cat /etc/cron.d/s3-sync
 
 ## Configuration
 
- * `AWS_DEFAULT_REGION` : Region of S3 bucket.
- * `AWS_S3_BUCKET_PATH` : Local path and S3 path (Split with `%`).
+### `AWS_DEFAULT_REGION`
+
+Region of S3 bucket.
+
+### `AWS_S3_BUCKET_PATH`
+
+Local path and S3 path (Split with `%`).
 
 e.g.
 
